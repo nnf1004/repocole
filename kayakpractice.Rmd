@@ -51,24 +51,26 @@ q1 <- conversions %>%
 ```
 
 
-### Questiob 2
+### Question 2
 ```{r}
 #Question 2 What is the distribution of US conversions by day of week (i.e., Mon - Fri)? (boxplots or histograms)
 
 q2 <- conversions %>% 
   filter(country_code == "us") %>% 
   mutate(day = wday(datestamp, label = TRUE)) %>% 
-  filter(day %in% c("Mon", "Tue", "Wed", "Thu", "Fri"))
+  filter(day %in% c("Mon", "Tue", "Wed", "Thu", "Fri")) %>% 
+  group_by(datestamp) %>% 
+  summarize(total_conv = sum(conversions, na.rm = TRUE)) %>% 
+  mutate(day = wday(datestamp, label = TRUE)) 
 
 #Histogram
-ggplot(data = q2, mapping = aes(x = conversions)) +
+ggplot(data = q2, mapping = aes(x = total_conv)) +
   geom_histogram() +
   facet_wrap(~day)
 
 #Boxplot
-ggplot(data = q2, mapping = aes(x = conversions)) +
-  geom_boxplot() +
-  facet_wrap(~day)
+ggplot(data = q2, mapping = aes(x = day, y = total_conv)) +
+  geom_boxplot() 
   
 ```
 
@@ -78,38 +80,42 @@ ggplot(data = q2, mapping = aes(x = conversions)) +
 #3 What is the distribution of US conversions by month? (boxplots or histogram)
 
 q3 <- conversions %>% 
-  filter(country_code == "us") %>% 
-  mutate(month = month(datestamp, label = TRUE)) 
+  filter(country_code == "us")%>% 
+  group_by(datestamp) %>% 
+  summarize(total_conv = sum(conversions, na.rm = TRUE)) %>% 
+  mutate(month = month(datestamp, label = TRUE))
 
 #Histogram
-ggplot(data = q3, mapping = aes(x = conversions)) +
+ggplot(data = q3, mapping = aes(x = total_conv)) +
   geom_histogram() +
   facet_wrap(~month)
 
 #Boxplot
-ggplot(data = q3, mapping = aes(x = conversions)) +
-  geom_boxplot() +
-  facet_wrap(~month)
+ggplot(data = q3, mapping = aes(x = month, y = total_conv)) +
+  geom_boxplot()
 
 ```
 
 ### Question 4
 ```{r}
 
-# 4. Fit a linear regression model with daily US convsersions as your response (total across all marketing channels) and Day of week (i.e., Mon - Fri) as the covariate. What is the coefficient on Monday? What does this mean?
+# 4. Fit a linear regression model with daily US conversions as your response (total across all marketing channels) and Day of week (i.e., Mon - Fri) as the covariate. What is the coefficient on Monday? What does this mean?
 
 q4 <- conversions %>% 
   mutate(day = wday(datestamp, label = TRUE)) %>%
   filter(country_code == "us") %>% 
-  filter(day %in% c("Mon", "Tue", "Wed", "Thu", "Fri")) %>% 
+  filter(day %in% c("Mon", "Tue", "Wed", "Thu", "Fri")) %>%
+  group_by(datestamp) %>% 
+  summarize(total_conv = sum(conversions, na.rm = TRUE)) %>%
+  mutate(day = wday(datestamp, label = TRUE)) %>%
   mutate(day2 =  as.character(day))
   
 
-lm4 <- lm(conversions ~ day2, q4)
+lm4 <- lm(total_conv ~ day2, q4)
 
 summary(lm4)
 
 ```
-The coefficient on Monday is 1234.4. This means that compared to friday, the conversions on monday will be 1234.4 greater, ceteris paribus.
+The coefficient on Monday is 5904. This means that compared to friday, the conversions on monday are expected to be 5904 greater, ceteris paribus.
 
 
