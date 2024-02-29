@@ -1,0 +1,110 @@
+---
+title: "gittestassignement"
+output: html_document
+date: "2024-02-27"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+library(tidyverse)
+library(lubridate)
+
+conversions = read.csv("https://raw.githubusercontent.com/dbreynol/DS809/main/data/conversions.csv")
+
+
+#lubridate functions
+#wday
+#month
+#year
+
+# 1. What are the top 5 countries in terms of Display Ad conversions?
+
+# 2. What is the distribution of US conversions by day of week (i.e., Mon - Fri)? (boxplots or histograms)
+
+# 3. What is the distribution of US conversions by month? (boxplots or histogram)
+
+# 4. Fit a linear regression model with daily US convsersions as your response (total across all marketing channels) and Day of week (i.e., Mon - Fri) as the covariate. What is the coefficient on Monday? What does this mean? 
+
+```
+
+
+```{r}
+#Question 1 What are the top 5 countries in terms of Display Ad conversions?
+
+q1 <- conversions %>% 
+  filter(marketing_channel == "Display Ads") %>% 
+  group_by(country_code) %>% 
+  summarise(tot_conv = sum(conversions, na.rm = TRUE)) %>% 
+  arrange(desc(tot_conv))
+
+#us: 4468724
+#fr: 669585
+#be: 373629
+#pt: 171598
+#ie: 109575
+
+
+```
+
+```{r}
+#Question 2 What is the distribution of US conversions by day of week (i.e., Mon - Fri)? (boxplots or histograms)
+
+q2 <- conversions %>% 
+  filter(country_code == "us") %>% 
+  mutate(day = wday(datestamp, label = TRUE)) %>% 
+  filter(day %in% c("Mon", "Tue", "Wed", "Thu", "Fri"))
+
+#Histogram
+ggplot(data = q2, mapping = aes(x = conversions)) +
+  geom_histogram() +
+  facet_wrap(~day)
+
+#Boxplot
+ggplot(data = q2, mapping = aes(x = conversions)) +
+  geom_boxplot() +
+  facet_wrap(~day)
+  
+```
+
+```{r}
+#3 What is the distribution of US conversions by month? (boxplots or histogram)
+
+q3 <- conversions %>% 
+  filter(country_code == "us") %>% 
+  mutate(month = month(datestamp, label = TRUE)) 
+
+#Histogram
+ggplot(data = q3, mapping = aes(x = conversions)) +
+  geom_histogram() +
+  facet_wrap(~month)
+
+#Boxplot
+ggplot(data = q3, mapping = aes(x = conversions)) +
+  geom_boxplot() +
+  facet_wrap(~month)
+
+```
+
+
+```{r}
+
+# 4. Fit a linear regression model with daily US convsersions as your response (total across all marketing channels) and Day of week (i.e., Mon - Fri) as the covariate. What is the coefficient on Monday? What does this mean?
+
+q4 <- conversions %>% 
+  mutate(day = wday(datestamp, label = TRUE)) %>%
+  filter(country_code == "us") %>% 
+  filter(day %in% c("Mon", "Tue", "Wed", "Thu", "Fri")) %>% 
+  mutate(day2 =  as.character(day))
+  
+
+lm4 <- lm(conversions ~ day2, q4)
+
+summary(lm4)
+```
+
+
+
