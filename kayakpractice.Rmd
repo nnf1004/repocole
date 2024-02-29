@@ -8,7 +8,7 @@ date: "2024-02-27"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 
 library(tidyverse)
 library(lubridate)
@@ -31,7 +31,7 @@ conversions = read.csv("https://raw.githubusercontent.com/dbreynol/DS809/main/da
 
 ```
 
-
+### Question 1
 ```{r}
 #Question 1 What are the top 5 countries in terms of Display Ad conversions?
 
@@ -50,6 +50,8 @@ q1 <- conversions %>%
 
 ```
 
+
+### Questiob 2
 ```{r}
 #Question 2 What is the distribution of US conversions by day of week (i.e., Mon - Fri)? (boxplots or histograms)
 
@@ -70,6 +72,8 @@ ggplot(data = q2, mapping = aes(x = conversions)) +
   
 ```
 
+
+#Question 3
 ```{r}
 #3 What is the distribution of US conversions by month? (boxplots or histogram)
 
@@ -89,7 +93,7 @@ ggplot(data = q3, mapping = aes(x = conversions)) +
 
 ```
 
-
+### Question 4
 ```{r}
 
 # 4. Fit a linear regression model with daily US convsersions as your response (total across all marketing channels) and Day of week (i.e., Mon - Fri) as the covariate. What is the coefficient on Monday? What does this mean?
@@ -104,7 +108,8 @@ q4 <- conversions %>%
 lm4 <- lm(conversions ~ day2, q4)
 
 summary(lm4)
-```
 
+```
+The coefficient on Monday is 1234.4. This means that compared to friday, the conversions on monday will be 1234.4 greater, ceteris paribus.
 
 
